@@ -1,6 +1,8 @@
 const errorHandler = (error, req, res, next) => {
-  let status = 500;
-  let message = "Internal Server Error";
+  let status = error.statusCode ||  500;
+  let message = error.message || "Internal Server Error";
+
+  console.log(error)
 
   if (error instanceof BadGatewayError) {
     statusCode = 502;

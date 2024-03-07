@@ -11,8 +11,8 @@ router.post("/signup", adminAlreadyExists, async (req, res, next) => {
     await Admin.create({ email: email, password: password });
 
     res.status(201).json({ msg: "Admin created successfully" });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 });
 
@@ -20,22 +20,27 @@ router.post("/courses", adminMiddleWare, async (req, res, next) => {
   const { title, description, imageUrl, price } = req.body;
 
   try {
-    await Course.create({
+    const course = await Course.create({
       title,
       description,
       imageUrl,
       price,
     });
 
-    res.status(201).json({ msg: "Admin created successfully" });
-  } catch (error) {
-    next(error);
+    res.status(201).json({ msg: "Course created successfully", courseId: course._id });
+  } catch (err) {
+    next(err);
   }
 });
 
-router.get("/courses", adminMiddleWare, (req, res, next) => {
-  res.json({ msg: "Course List" });
-});
+router.get("/courses", adminMiddleWare, async (req, res, next) => {
+  try {
+    const allCourses = await Course.find({});
 
+    res.json({ courses: allCourses });
+  } catch (err) {
+    next(err);
+  }
+});
 
 module.exports = router;
