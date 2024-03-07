@@ -1,36 +1,35 @@
 const { Admin } = require("../db/index");
 
-const adminMiddleWare = (req, res, next) => {
+const adminMiddleWare = async (req, res, next) => {
   const { email, password } = req.headers;
 
-  Admin.findOne({ email: email, password: password })
-    .then((value) => {
-      if (value) {
-        next();
-      } else {
-        res.status(403).json({ msg: "Admin doesn't exists" });
-      }
-    })
-    .catch((err) => {
-      res.status(500).json({ msg: "Internal server error" });
-    });
+  try {
+    const admin = await Admin.findOne({ email: email, password: password });
+
+    if (admin) {
+      next();
+    } else {
+      res.status(403).json({ msg: "Admin doesn't exist" });
+    }
+  } catch (err) {
+    next(err);
+  }
 };
 
-const adminAlreadyExists = (req, res, next) => {
-  console.log(req.body);
-  const { email } = req.body;
+const adminAlreadyExists =  async (req, res, next) => {
+const { email } = req.body;
 
-  Admin.findOne({ email: email })
-    .then((value) => {
-      if (value) {
-        res.status(403).json({ msg: "Admin already exists" });
-      } else {
-        next();
-      }
-    })
-    .catch((err) => {
-      res.status(500).json({ msg: "Internal server error" });
-    });
+  try {
+    const admin = await Admin.findOne({ email: email });
+    console.log(admin)
+    if (admin) {
+      res.status(403).json({ msg: "Admin already exists" });
+    } else {
+      next();
+    }
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = {
