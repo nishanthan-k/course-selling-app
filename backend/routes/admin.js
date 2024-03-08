@@ -1,5 +1,5 @@
 const express = require("express");
-const { adminMiddleWare, adminAlreadyExists } = require("../middlewares/admin");
+const { adminMiddleware, adminAlreadyExists } = require("../middlewares/admin");
 const { Admin, Course } = require("../db");
 const router = express.Router();
 
@@ -16,8 +16,8 @@ router.post("/signup", adminAlreadyExists, async (req, res, next) => {
   }
 });
 
-router.post("/courses", adminMiddleWare, async (req, res, next) => {
-  const { title, description, imageUrl, price } = req.body;
+router.post("/courses", adminMiddleware, async (req, res, next) => {
+  const { title, description, imageUrl, price, isPublished } = req.body;
 
   try {
     const course = await Course.create({
@@ -25,15 +25,18 @@ router.post("/courses", adminMiddleWare, async (req, res, next) => {
       description,
       imageUrl,
       price,
+      isPublished
     });
 
-    res.status(201).json({ msg: "Course created successfully", courseId: course._id });
+    res
+      .status(201)
+      .json({ msg: "Course created successfully", courseId: course._id });
   } catch (err) {
     next(err);
   }
 });
 
-router.get("/courses", adminMiddleWare, async (req, res, next) => {
+router.get("/courses", adminMiddleware, async (req, res, next) => {
   try {
     const allCourses = await Course.find({});
 

@@ -1,6 +1,6 @@
 const { Admin } = require("../db/index");
 
-const adminMiddleWare = async (req, res, next) => {
+const adminMiddleware = async (req, res, next) => {
   const { email, password } = req.headers;
 
   try {
@@ -16,12 +16,12 @@ const adminMiddleWare = async (req, res, next) => {
   }
 };
 
-const adminAlreadyExists =  async (req, res, next) => {
-const { email } = req.body;
+const adminAlreadyExists = async (req, res, next) => {
+  const { email } = req.body;
 
   try {
     const admin = await Admin.findOne({ email: email });
-    console.log(admin)
+
     if (admin) {
       res.status(403).json({ msg: "Admin already exists" });
     } else {
@@ -33,6 +33,6 @@ const { email } = req.body;
 };
 
 module.exports = {
-  adminMiddleWare,
+  adminMiddleware,
   adminAlreadyExists,
 };
