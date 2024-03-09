@@ -1,18 +1,16 @@
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../config");
 const { Admin } = require("../db/index");
 
-const adminMiddleware = async (req, res, next) => {
-  const { email, password } = req.headers;
+const adminMiddleware = (req, res, next) => {
+  const authorization = req.headers.authorization;
+  const token = authorization.split(" ")[1];  //["Bearer", token]
+  const jwtDecode = jwt.verify(token, JWT_SECRET);
 
-  try {
-    const admin = await Admin.findOne({ email: email, password: password });
-
-    if (admin) {
-      next();
-    } else {
-      res.status(403).json({ msg: "Admin doesn't exist" });
-    }
-  } catch (err) {
-    next(err);
+  if (jwtDecode.username && jwtDecode.type === "admin") {
+    next();
+  } else {
+    res.status(403).json({ msg: "You are not authenticated" });
   }
 };
 

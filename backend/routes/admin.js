@@ -1,6 +1,8 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../config");
 const { adminMiddleware, adminAlreadyExists } = require("../middlewares/admin");
-const { Admin, Course } = require("../db");
+const { Admin, Course, User } = require("../db");
 const router = express.Router();
 
 router.post("/signup", adminAlreadyExists, async (req, res, next) => {
@@ -16,6 +18,23 @@ router.post("/signup", adminAlreadyExists, async (req, res, next) => {
   }
 });
 
+router.post("/signin", async (req, res, next) => {
+  const { email, password } = req.body;
+
+  const admin = await Admin.findOne({ email, password });
+  try {
+    if (admin) {
+      const token = jwt.sign({ username: email, type: "admin" }, JWT_SECRET);
+
+      res.json({ token: token });
+    } else {
+      res.status(411).json({ msg: "Incorrect credentials" });
+    }
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post("/courses", adminMiddleware, async (req, res, next) => {
   const { title, description, imageUrl, price, isPublished } = req.body;
 
@@ -25,7 +44,7 @@ router.post("/courses", adminMiddleware, async (req, res, next) => {
       description,
       imageUrl,
       price,
-      isPublished
+      isPublished,
     });
 
     res

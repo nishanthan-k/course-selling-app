@@ -1,29 +1,26 @@
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../config");
 const { User } = require("../db/index");
 
 const userMiddleware = async (req, res, next) => {
-  const { email, password } = req.headers;
+  const authorization = req.headers.authorization;
+  const token = authorization.split(" ")[1];
+  const jwtDecode = jwt.verify(token, JWT_SECRET);
 
-  try {
-    const user = await User.findOne({ email: email, password: password });
-
-    if (user) {
-      next();
-    } else {
-      return res.status(403).json({ msg: "User doesn't exists" });
-    }
-  } catch (err) {
-    next(err);
+  if (jwtDecode.username && jwtDecode.type === "user") {
+    next();
+  } else {
+    res.status(403).json({ msg: "You are not authenticated" });
   }
 };
 
 const userAlreadyExists = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email } = req.body;
 
   try {
-    const user = await User.findOne({ email: email, password: password });
+    const user = await User.findOne({ email: email });
 
     if (user) {
-      console.log(user);
       res.status(403).json({ msg: "User already exists" });
     } else {
       next();
