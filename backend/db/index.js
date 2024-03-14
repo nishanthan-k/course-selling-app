@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 mongoose.connect(
-  "mongodb+srv://nishanthan:Shivayanama@owncluster.pgtbuvo.mongodb.net/course_selling_app"
+  "mongodb+srv://usernamehere:passowordhere@owncluster.pgtbuvo.mongodb.net/course_selling_app"
 );
 
 const AdminSchema = new mongoose.Schema({
